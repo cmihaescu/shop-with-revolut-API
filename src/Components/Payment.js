@@ -45,7 +45,7 @@ const Payment = () => {
     var card = instance.createCardField({
       target: document.getElementById("card-field"),
       onSuccess() {
-        window.alert("Thank you!");
+        window.alert("Thank you! Payment completed");
       },
       onError(message) {
         window.alert("Oh no :(");
