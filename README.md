@@ -5,7 +5,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Starting the project
 
 You have to install the dependencies on the client side as well as on the server side.
-So in your project directories run "npm install", after that cd into "Server" and run "npm install" there as well.
+So in your project directory run "npm install", after that cd into "Server" and run "npm install" there as well.
 
 Make sure you also create a .env file in the "Server" folder where you will add API_KEY= "your API_Key" from your revolut or revolut-sandbox account.
 
