@@ -82,6 +82,12 @@ const Payment = () => {
   return (
     <div>
       <Link to="/">Home</Link>
+      <div>
+        <p>Use the folowing test cards for succesful payments:</p>
+        <p>Visa: 4929420573595709</p>
+        <p>Mastercard: 5281438801804148</p>
+        <p>For expiry date use any future date, and for CVV any numbers you wish</p>
+      </div>
       <form
         style={{
           display: "flex",
