@@ -93,16 +93,16 @@ const Payment = () => {
         onSubmit={(e) => e.preventDefault()}
       >
         <div style={{ display: "flex", alignItems: "stretch" }}>
-          <label>Full name: </label>
+          <label style={{margin:'5px'}}>Full name: </label>
           <input
             name="full_name"
             placeholder="John Doe"
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div style={{ display: "flex", alignItems: "stretch" }}>
-          <label>Email: </label>
-          <input
+        <div style={{ display: "flex", alignItems: "stretch", minWidth:'400px' }}>
+          <label style={{margin:'5px'}}>Email: </label>
+          <input 
             name="email"
             placeholder="customer@example.com"
             onChange={(e) => setEmail(e.target.value)}
