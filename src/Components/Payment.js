@@ -82,7 +82,6 @@ const Payment = () => {
   return (
     <div>
       <Link to="/">Home</Link>
-      <pre>Order Public_id: {public_id}</pre>
       <form
         style={{
           display: "flex",
