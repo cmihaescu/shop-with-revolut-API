@@ -27,6 +27,7 @@ const Payment = () => {
 
   let public_id = useHistory().location.state;
 
+
   const payWithPopup = () =>
     RevolutCheckout(public_id, "sandbox").then(function (instance) {
       instance.payWithPopup({
@@ -34,7 +35,8 @@ const Payment = () => {
           window.alert("Thank you! Payment was succesful");
         },
         onError(message) {
-          window.alert("Oh no :( you broke! or something wrong in the code");
+          console.log(message)
+          window.alert(message);
         },
         name,
         email,
@@ -47,14 +49,13 @@ const Payment = () => {
     var card = instance.createCardField({
       target: document.getElementById("card-field"),
       onSuccess() {
-        window.alert("Thank you! Payment completed");
+        setTimeout(() => {
+          window.alert("Thank you! Payment completed"); 
+        }, 1000); 
       },
       onError(message) {
         window.alert(`Oh no :( ${message}`);
-      },
-      name,
-      email,
-      billingAddress,
+      }
     });
 
     document
