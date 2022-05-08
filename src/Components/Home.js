@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import Checkout from "./Checkout";
+import CheckoutSandbox from "./CheckoutSandbox";
+import CheckoutLive from "./CheckoutLive";
+import RevolutCheckout from "@revolut/checkout";
 
 function Home() {
   const [currency, setCurrency] = useState("USD");
@@ -8,10 +10,11 @@ function Home() {
   const [cart, setCart] = useState([]);
   const [sum, setSum] = useState(0);
   const currencies = ["USD", "EUR", "GBP", "RON"];
+  const [result, setResult] = useState(null);
 
   const items = [
     { name: "Backpack", price: 150 },
-    { name: "Hat", price: 15 },
+    { name: "Hat", price: 0.05 },
     { name: "Jacket", price: 300 },
     { name: "Boots", price: 250 },
     { name: "Skis", price: 600 },
@@ -22,7 +25,7 @@ function Home() {
     { name: "Snowboard", price: 500 },
   ];
 
-  let history = useHistory()
+  let history = useHistory();
 
   useEffect(() => {
     const reducer = (prevVal, currVal) => prevVal + currVal;
@@ -38,49 +41,119 @@ function Home() {
     setCart([...cart]);
   };
 
+  //============PAY WITH APPLE/GOOGLE PAY============
+
+  const payWithRevolutApple = () => {
+    const RC = RevolutCheckout("6dd2395d-1f7e-4f7e-8d87-2979304340ba", "prod");
+    const shippingOptions = [
+      {
+        id: "flex",
+        label: "The big flex express shipping",
+        amount: 1,
+        description: "The shipping method faster than batman",
+      },
+      {
+        id: "countrystrong",
+        label: "Country strong shipping",
+        amount: 3,
+        description: "The shipping method faster than superman",
+      },
+    ];
+
+    const paymentRequest = RC.paymentRequest({
+      target: document.getElementById("revolut-payment-request"),
+      requestShipping: true,
+      shippingOptions,
+      onShippingOptionChange: (selectedShippingOption) => {
+        // ideally compute new total price. calls can be made to a server here
+        return Promise.resolve({
+          status: "success",
+          total: {
+            amount: sum + selectedShippingOption.amount,
+          },
+        });
+      },
+      onShippingAddressChange: (selectedShippingAddress) => {
+        // ideally compute new total price. calls can be made to a server here
+        const newShippingOption = {
+          id: "new-shipping",
+          label: "The new ultra-fast method",
+          amount: 5,
+          description: "The shipping method faster than lightening",
+        };
+
+        return Promise.resolve({
+          status: "success",
+          shippingOptions: [newShippingOption, ...shippingOptions],
+          total: {
+            amount: 5,
+            // amount: amount + newShippingOption.amount,
+          },
+        });
+      },
+      onSuccess() {
+        setResult("Paid");
+        alert("Payment with Google/Apple pay was succesfull!");
+      },
+      onError(error) {
+        setResult(`Error: ${error.message}`);
+        alert(error);
+      },
+      // buttonStyle: { size: 'small', variant: 'light-outlined' },
+    });
+
+    paymentRequest.canMakePayment().then((result) => {
+      if (result) {
+        paymentRequest.render();
+      } else {
+        setResult("Not supported");
+        paymentRequest.destroy();
+      }
+    });
+  };
 
   return (
-    <div>
+    <div className="container">
       <h1> Revolut Shop </h1>
-      <div
-        className="container"
+      <div        
         style={{ display: "grid", gridTemplateColumns: "1fr 3fr" }}
       >
         <div className="items">
-          <div
-            className="searchAndCurrency"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            <div>
-              <p style={{ display: "inline-block", margin: "5px" }}>
-                Search item:
-              </p>
-              <input
-                onChange={(event) => {
-                  setSearchfield(event.target.value);
-                }}
-              ></input>
-            </div>
-            <div className="Currency">
-              <select
-                onChange={(event) => setCurrency(event.target.value)}
-                placeholder="USD"
-              >
-                {currencies.map((currency) => (
-                  <option key={currency}> {currency} </option>
-                ))}
-              </select>
-            </div>
-          </div>
           <div className="itemsList" style={{ textAlign: "left" }}>
             <ul>
+              <li
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  margin: "5px",
+                }}
+              >
+                <input
+                  style={{ display: "inline-block", margin: "1em 5px 5px 5px" }}
+                  placeholder="Search item"
+                  onChange={(event) => {
+                    setSearchfield(event.target.value);
+                  }}
+                ></input>
+                <select
+                  className="pay-option-button"
+                  style={{ padding: "0px 10px" }}
+                  onChange={(event) => setCurrency(event.target.value)}
+                  placeholder="USD"
+                >
+                  {currencies.map((currency) => (
+                    <option key={currency}> {currency} </option>
+                  ))}
+                </select>
+              </li>
               {items
                 .filter((item) =>
                   item.name.toLowerCase().includes(searchfield.toLowerCase())
                 )
                 .map((item, i) => {
                   return (
-                    <li key= {i}
+                    <li
+                      key={i}
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -97,6 +170,7 @@ function Home() {
                         : Math.round(Number(item.price) * 4.28)}{" "}
                       {currency}
                       <button
+                        className="pay-option-button"
                         onClick={() => {
                           addToCart(i);
                         }}
@@ -116,7 +190,8 @@ function Home() {
               <ul style={{ listStyle: "none" }}>
                 {cart.map((item, i) => {
                   return (
-                    <li key={i}
+                    <li
+                      key={i}
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -126,6 +201,7 @@ function Home() {
                     >
                       {item.name}
                       <button
+                        className="pay-option-button"
                         onClick={() => removeFromCart(i)}
                         style={{ margin: "5px" }}
                       >
@@ -135,11 +211,21 @@ function Home() {
                   );
                 })}
               </ul>
-              <button onClick={()=> Checkout(sum, currency, history)}>
+              <button
+                className="pay-option-button"
+                onClick={() => CheckoutSandbox(sum, currency, history)}
+              >
                 {" "}
-                Go to Checkout
+                Go to Checkout-Sandbox
               </button>
-              <p>
+              <button
+                className="pay-option-button"
+                onClick={() => CheckoutLive(sum, currency, history)}
+              >
+                {" "}
+                Go to Checkout-Live
+              </button>
+              <p style={{background:'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%)'}}>
                 Total:{" "}
                 {currency === "GBP"
                   ? Math.round(sum * 0.74)
@@ -150,6 +236,37 @@ function Home() {
                   : Math.round(sum)}{" "}
                 {currency}
               </p>
+              <p>
+                {String.fromCharCode(8211)} OR {String.fromCharCode(8211)}
+              </p>
+              <button
+                className="pay-option-button Gpay-button"
+                onClick={() => {
+                  payWithRevolutApple();
+                  CheckoutLive(sum, currency, history);}}
+              >
+                {" "}
+                <p
+                  style={{display:'inline-block'}}
+                  > Issue order for <span>&nbsp;</span></p>
+                <img
+                  style={{display:'inline-block', verticalAlign:'middle'}}
+                  width="50px"
+                  alt="Google Pay (GPay) Logo (2018-2020)"
+                  src={
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Google_Pay_%28GPay%29_Logo_%282018-2020%29.svg/512px-Google_Pay_%28GPay%29_Logo_%282018-2020%29.svg.png"
+                  }
+                />
+              </button>
+              <div
+                style={{
+                  width: "400px",
+                  margin: "10px auto",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}
+                id="revolut-payment-request"
+              ></div>
             </div>
           ) : (
             ""

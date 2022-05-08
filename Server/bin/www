@@ -4,7 +4,8 @@ require('dotenv').config()
 /**
  * Module dependencies.
  */
-const API_KEY = process.env.API_KEY
+const API_KEY_SANDBOX = process.env.API_KEY_SANDBOX
+const API_KEY_LIVE = process.env.API_KEY_LIVE
 var app = require('../app');
 var debug = require('debug')('server:server');
 var http = require('http');
@@ -88,6 +89,7 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug(`Listening on Port ${port}`);
-  console.log('API_KEY:', API_KEY? 'API_KEY was found' : "API_key was not found")
+  console.log('API_KEY_SANDBOX:', API_KEY_SANDBOX? 'API_KEY_SANDBOX was found' : "API_key for sandbox was not found")
+  console.log('API_KEY_Live:', API_KEY_LIVE? 'API_KEY_LIVE was found' : "API_key for live was not found")
   console.log(`Listening on Port ${port}`);
 }

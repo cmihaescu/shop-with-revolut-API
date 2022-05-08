@@ -1,6 +1,7 @@
 import React from 'react'
 import Home from './Home'
-import Payment from './Payment'
+import PaymentSandbox from './PaymentSandbox'
+import PaymentLive from './PaymentLive';
 import {
     Switch,
     Route
@@ -12,9 +13,12 @@ function Routes() {
           <Route exact path="/">
             <Home />
           </Route>
-          <Route path='/card'>
-            <Payment />
-          </Route>    
+          <Route path='/cardSandbox'>
+            <PaymentSandbox />
+          </Route>
+          <Route path='/cardLive'>
+            <PaymentLive />
+          </Route>     
           <Route path='/*'>
             <div> Path not found</div>
           </Route>

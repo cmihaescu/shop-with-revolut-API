@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import RevolutCheckout from "@revolut/checkout";
 
-const Payment = () => {
+const PaymentLive = () => {
   const [name, setName] = useState(null);
   const [result, setResult] = useState(null);
   const [email, setEmail] = useState(null);
@@ -25,37 +25,44 @@ const Payment = () => {
 
   //============PAY WITH POPUP============
 
-  let public_id = useHistory().location.state;
+  let public_id = useHistory().location.state.public_id;
+  let order_id = useHistory().location.state.id;
+  let sum = useHistory().location.state.order_amount.value
+  let body = useHistory().location.state
 
+  console.log("public_id-Live", public_id);
+  console.log("order_id-Live", order_id);
+  console.log('amount', sum)
+  console.log('body', body)
 
   const payWithPopup = () =>
-    RevolutCheckout(public_id, "sandbox").then(function (instance) {
+    RevolutCheckout(public_id, "prod").then(function (instance) {
       instance.payWithPopup({
         onSuccess() {
           window.alert("Thank you! Payment was succesful");
         },
         onError(message) {
-          console.log(message)
           window.alert(message);
         },
         name,
         email,
+        savePaymentMethodFor: "merchant",
       });
     });
 
   //============PAY WITH CARDFIELD============
 
-  RevolutCheckout(public_id, "sandbox").then(function (instance) {
+  RevolutCheckout(public_id, "prod").then(function (instance) {
     var card = instance.createCardField({
       target: document.getElementById("card-field"),
       onSuccess() {
         setTimeout(() => {
-          window.alert("Thank you! Payment completed"); 
-        }, 1000); 
+          window.alert("Thank you! Payment completed");
+        }, 1000);
       },
       onError(message) {
         window.alert(`Oh no :( ${message}`);
-      }
+      },
     });
 
     document
@@ -72,7 +79,7 @@ const Payment = () => {
   //============PAY WITH REVOLUTPAY============
 
   const payWithRevolutPay = () => {
-    RevolutCheckout(public_id, "sandbox").then(function (instance) {
+    RevolutCheckout(public_id, "prod").then(function (instance) {
       instance.revolutPay({
         target: document.getElementById("revolut-pay"),
         phone: "+441632960022", // recommended
@@ -82,55 +89,76 @@ const Payment = () => {
         onError(error) {
           console.error("Payment failed: " + error.message);
         },
+        capture_mode: "MANUAL",
       });
     });
   };
 
   //============PAY WITH APPLE/GOOGLE PAY============
-  const payWithRevolutApple = () => {
-    const RC = RevolutCheckout(public_id);
+
+    const payWithRevolutApple = () => {
+    const RC = RevolutCheckout(public_id, "prod");
+    const shippingOptions = [
+      {
+        id: "flex",
+        label: "The big flex express shipping",
+        amount: 1,
+        description: "The shipping method faster than batman",
+      },
+      {
+        id: "countrystrong",
+        label: "Country strong shipping",
+        amount: 3,
+        description: "The shipping method faster than superman",
+      },
+    ];
+
     const paymentRequest = RC.paymentRequest({
       target: document.getElementById("revolut-payment-request"),
       requestShipping: true,
-      shippingOptions: [
-        {
-          id: "prima",
-          label: "avion",
-          amount: 300,
-          description: "cu avion ba fraiere",
-        },
-        {
-          id: "a doua",
-          label: "taxi",
-          amount: 200,
-          description: "cu taxi ba fraiere",
-        },
-        {
-          id: "a treia",
-          label: "train",
-          amount: 100,
-          description: "cu trenul ba fraiere",
-        },
-      ],
-      // onShippingAddressChange: (selectedShippingAddress) => {
-      //   console.log("selectedShippingAddress", selectedShippingAddress);
-      // },
-      onSuccess(message) {
-        console.log("onSuccess", message);
+      shippingOptions,
+      onShippingOptionChange: (selectedShippingOption) => {
+        // ideally compute new total price. calls can be made to a server here
+        return Promise.resolve({
+          status: "success",
+          total: {
+            amount: sum + selectedShippingOption.amount,
+          },
+        });
+      },
+      onShippingAddressChange: (selectedShippingAddress) => {
+        // ideally compute new total price. calls can be made to a server here
+        const newShippingOption = {
+          id: "new-shipping",
+          label: "The new ultra-fast method",
+          amount: 5,
+          description: "The shipping method faster than lightening",
+        };
+
+        return Promise.resolve({
+          status: "success",
+          shippingOptions: [newShippingOption, ...shippingOptions],
+          total: {
+            // amount: 5
+            amount: sum + newShippingOption.amount,
+          },
+        });
+      },
+      onSuccess() {
         setResult("Paid");
+        alert("Payment with Google/Apple pay was succesfull!")
       },
       onError(error) {
-        console.log("onError", error);
         setResult(`Error: ${error.message}`);
+        alert(error)
       },
+      // buttonStyle: { size: 'small', variant: 'light-outlined' },
     });
 
     paymentRequest.canMakePayment().then((result) => {
       if (result) {
-        console.log("can make payement", result);
         paymentRequest.render();
       } else {
-        console.log("cannot make payement");
         setResult("Not supported");
         paymentRequest.destroy();
       }
@@ -138,45 +166,40 @@ const Payment = () => {
   };
 
   return (
+    <div className="payment-live-page" style={{display:'grid', gridTemplateColumns: '2fr 1fr'}}>
     <div>
-      <Link to="/">Home</Link>
-      <div>
-        <p>Use the folowing test cards for succesful payments:</p>
-        <p>Visa: 4929420573595709</p>
-        <p>Mastercard: 5281438801804148</p>
-        <p>
-          For expiry date use any future date, and for CVV any numbers you wish
-        </p>
-      </div>
+      <Link to="/" >Home</Link>
       <form
         style={{
           display: "flex",
           flexDirection: "column",
-          width: "15%",
-          margin: " 0 auto",
+          width: "50%",
+          margin: " 10px auto",
         }}
         onSubmit={(e) => e.preventDefault()}
       >
-        <div style={{ display: "flex", alignItems: "stretch" }}>
-          <label style={{ margin: "5px" }}>Full name: </label>
+        <div style={{ display: "flex", justifyContent:'center' }}>
+          <label></label>
           <input
             name="full_name"
-            placeholder="John Doe"
+            placeholder="Full Name"
+            style={{width:'100%'}}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
         <div
-          style={{ display: "flex", alignItems: "stretch", minWidth: "400px" }}
+          style={{ display: "flex", justifyContent:'center'}}
         >
-          <label style={{ margin: "5px" }}>Email: </label>
+          <label></label>
           <input
             name="email"
             placeholder="customer@example.com"
+            style={{width:'100%'}}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div>
-          <label>Card</label>
+          <label></label>
           <div name="card"></div>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
@@ -192,10 +215,7 @@ const Payment = () => {
             placeholder="Region"
             onChange={getBillingAddress}
           />
-          <input 
-            name="city" 
-            placeholder="City" 
-            onChange={getBillingAddress} />
+          <input name="city" placeholder="City" onChange={getBillingAddress} />
           <input
             name="streetLine1"
             placeholder="Address line 1"
@@ -229,16 +249,16 @@ const Payment = () => {
           margin: "10px auto",
           display: "flex",
           justifyContent: "space-between",
-          width: "20%",
+          width: "60%",
         }}
       >
-        <button id="button-submit">Pay with Card</button>
-        <button onClick={() => payWithPopup()}>Pay with Popup</button>
-        <button onClick={() => payWithRevolutPay()}>
+        <button className='pay-option-button' id="button-submit">Pay with Card</button>
+        <button className='pay-option-button' onClick={() => payWithPopup()}>Pay with Popup</button>
+        <button className='pay-option-button' onClick={() => payWithRevolutPay()}>
           Pay with Revolut Pay
         </button>
-        <button onClick={() => payWithRevolutApple()}>
-          Pay with Revolut Apple
+        <button className='pay-option-button' onClick={() => payWithRevolutApple()}>
+          Pay with Apple/Google Pay
         </button>
       </div>
       <div
@@ -250,9 +270,23 @@ const Payment = () => {
         }}
         id="revolut-pay"
       ></div>
-      <div id="revolut-payment-request"></div>
+      <div
+        style={{
+          width: "400px",
+          margin: "10px auto",
+          borderRadius: "10px",
+          padding: "6px",
+        }}
+        id="revolut-payment-request"
+      ></div>
+    </div>
+    <div>
+        <pre>
+         <strong>Order</strong>: {JSON.stringify(body, undefined, 2)}
+        </pre>
+    </div>
     </div>
   );
 };
 
-export default Payment;
+export default PaymentLive;
