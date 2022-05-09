@@ -8,7 +8,7 @@ First, you need to create a revolut business [sandbox account](https://sandbox-b
 Second, install the dependencies on the client side as well as on the server side.
 So in your project directory run "npm install", after that cd into "Server" and run "npm install" there as well.
 
-Make sure you also create a .env file in the "Server" folder where you will add API_KEY= "your API_Key" from your revolut or revolut-sandbox account.
+Make sure you also create a .env file in the "Server" folder where you will add API_KEY= "your API_Key" from your revolut or revolut-sandbox account or from your real account in case you have a Business account with Revolut.
 
 Open 2 terminals: first for your Server folder and one in your project directory. Run "npm start" in both of them.
 
