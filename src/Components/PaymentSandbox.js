@@ -27,8 +27,6 @@ const PaymentSandbox = () => {
   let public_id = useHistory().location.state.public_id;
   let order_id = useHistory().location.state.id;
   let body = useHistory().location.state;
-  console.log("public_id sandbox:", public_id);
-  console.log("order_id sandbox:", order_id);
 
   const payWithPopup = () =>
     RevolutCheckout(public_id, "sandbox").then(function (instance) {
@@ -78,6 +76,7 @@ const PaymentSandbox = () => {
       instance.revolutPay({
         target: document.getElementById("revolut-pay"),
         phone: "+441632960022", // recommended
+        buttonStyle: {variant:"light-outlined"},
         onSuccess() {
           console.log("Payment completed");
         },
@@ -91,7 +90,7 @@ const PaymentSandbox = () => {
   return (
     <div className="payment-sandbox-page" style={{ display: "grid", gridTemplateColumns: "2fr 1fr" }}>
       <div>
-        <Link to="/">Home</Link>
+        <Link className="pay-option-button" to="/">Home</Link>
         <div>
           <p>Use the folowing test cards for succesful payments:</p>
           <p>Visa: 4929420573595709</p>
@@ -179,6 +178,7 @@ const PaymentSandbox = () => {
             border: "solid black 3px",
             borderRadius: "10px",
             padding: "6px",
+            background:"#fff"
           }}
           id="card-field"
         ></div>

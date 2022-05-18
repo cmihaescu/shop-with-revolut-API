@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import RevolutCheckout from "@revolut/checkout";
+import UpdateOrderLive from "./UpdateOrder"
 
 const PaymentLive = () => {
   const [name, setName] = useState(null);
@@ -24,10 +25,11 @@ const PaymentLive = () => {
   };
 
   //============PAY WITH POPUP============
-
+  let history = useHistory();
   let public_id = useHistory().location.state.public_id;
   let order_id = useHistory().location.state.id;
   let sum = useHistory().location.state.order_amount.value
+  let currency = useHistory().location.state.order_amount.currency
   let body = useHistory().location.state
 
   console.log("public_id-Live", public_id);
@@ -83,6 +85,7 @@ const PaymentLive = () => {
       instance.revolutPay({
         target: document.getElementById("revolut-pay"),
         phone: "+441632960022", // recommended
+        buttonStyle: {variant:"light-outlined"},
         onSuccess() {
           console.log("Payment completed");
         },
@@ -117,12 +120,14 @@ const PaymentLive = () => {
       target: document.getElementById("revolut-payment-request"),
       requestShipping: true,
       shippingOptions,
-      onShippingOptionChange: (selectedShippingOption) => {
+      onShippingOptionChange: async (selectedShippingOption) => {
+        console.log("amount frontend", selectedShippingOption.label, sum+selectedShippingOption.amount)
+        await UpdateOrderLive(sum+selectedShippingOption.amount, currency, order_id, history)
         // ideally compute new total price. calls can be made to a server here
         return Promise.resolve({
           status: "success",
           total: {
-            amount: sum + selectedShippingOption.amount,
+           amount: sum + selectedShippingOption.amount,
           },
         });
       },
@@ -168,7 +173,7 @@ const PaymentLive = () => {
   return (
     <div className="payment-live-page" style={{display:'grid', gridTemplateColumns: '2fr 1fr'}}>
     <div>
-      <Link to="/" >Home</Link>
+      <Link className="pay-option-button" to="/" >Home</Link>
       <form
         style={{
           display: "flex",
@@ -240,6 +245,7 @@ const PaymentLive = () => {
           border: "solid black 3px",
           borderRadius: "10px",
           padding: "6px",
+          background:"#fff"
         }}
         id="card-field"
       ></div>

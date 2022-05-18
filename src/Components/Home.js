@@ -9,6 +9,7 @@ function Home() {
   const [searchfield, setSearchfield] = useState("");
   const [cart, setCart] = useState([]);
   const [sum, setSum] = useState(0);
+  // const [capture, setCapture] = useState(0);
   const currencies = ["USD", "EUR", "GBP", "RON"];
   const [result, setResult] = useState(null);
 
@@ -43,74 +44,74 @@ function Home() {
 
   //============PAY WITH APPLE/GOOGLE PAY============
 
-  const payWithRevolutApple = () => {
-    const RC = RevolutCheckout("6dd2395d-1f7e-4f7e-8d87-2979304340ba", "prod");
-    const shippingOptions = [
-      {
-        id: "flex",
-        label: "The big flex express shipping",
-        amount: 1,
-        description: "The shipping method faster than batman",
-      },
-      {
-        id: "countrystrong",
-        label: "Country strong shipping",
-        amount: 3,
-        description: "The shipping method faster than superman",
-      },
-    ];
+  // const payWithRevolutApple = () => {
+  //   const RC = RevolutCheckout("6dd2395d-1f7e-4f7e-8d87-2979304340ba", "prod");
+  //   const shippingOptions = [
+  //     {
+  //       id: "flex",
+  //       label: "The big flex express shipping",
+  //       amount: 1,
+  //       description: "The shipping method faster than batman",
+  //     },
+  //     {
+  //       id: "countrystrong",
+  //       label: "Country strong shipping",
+  //       amount: 3,
+  //       description: "The shipping method faster than superman",
+  //     },
+  //   ];
 
-    const paymentRequest = RC.paymentRequest({
-      target: document.getElementById("revolut-payment-request"),
-      requestShipping: true,
-      shippingOptions,
-      onShippingOptionChange: (selectedShippingOption) => {
-        // ideally compute new total price. calls can be made to a server here
-        return Promise.resolve({
-          status: "success",
-          total: {
-            amount: sum + selectedShippingOption.amount,
-          },
-        });
-      },
-      onShippingAddressChange: (selectedShippingAddress) => {
-        // ideally compute new total price. calls can be made to a server here
-        const newShippingOption = {
-          id: "new-shipping",
-          label: "The new ultra-fast method",
-          amount: 5,
-          description: "The shipping method faster than lightening",
-        };
+  //   const paymentRequest = RC.paymentRequest({
+  //     target: document.getElementById("revolut-payment-request"),
+  //     requestShipping: true,
+  //     shippingOptions,
+  //     onShippingOptionChange: (selectedShippingOption) => {
+  //       // ideally compute new total price. calls can be made to a server here
+  //       return Promise.resolve({
+  //         status: "success",
+  //         total: {
+  //           amount: sum + selectedShippingOption.amount,
+  //         },
+  //       });
+  //     },
+  //     onShippingAddressChange: (selectedShippingAddress) => {
+  //       // ideally compute new total price. calls can be made to a server here
+  //       const newShippingOption = {
+  //         id: "new-shipping",
+  //         label: "The new ultra-fast method",
+  //         amount: 5,
+  //         description: "The shipping method faster than lightening",
+  //       };
 
-        return Promise.resolve({
-          status: "success",
-          shippingOptions: [newShippingOption, ...shippingOptions],
-          total: {
-            amount: 5,
-            // amount: amount + newShippingOption.amount,
-          },
-        });
-      },
-      onSuccess() {
-        setResult("Paid");
-        alert("Payment with Google/Apple pay was succesfull!");
-      },
-      onError(error) {
-        setResult(`Error: ${error.message}`);
-        alert(error);
-      },
-      // buttonStyle: { size: 'small', variant: 'light-outlined' },
-    });
+  //       return Promise.resolve({
+  //         status: "success",
+  //         shippingOptions: [newShippingOption, ...shippingOptions],
+  //         total: {
+  //           amount: 5,
+  //           // amount: amount + newShippingOption.amount,
+  //         },
+  //       });
+  //     },
+  //     onSuccess() {
+  //       setResult("Paid");
+  //       alert("Payment with Google/Apple pay was succesfull!");
+  //     },
+  //     onError(error) {
+  //       setResult(`Error: ${error.message}`);
+  //       alert(error);
+  //     },
+  //     // buttonStyle: { size: 'small', variant: 'light-outlined' },
+  //   });
 
-    paymentRequest.canMakePayment().then((result) => {
-      if (result) {
-        paymentRequest.render();
-      } else {
-        setResult("Not supported");
-        paymentRequest.destroy();
-      }
-    });
-  };
+  //   paymentRequest.canMakePayment().then((result) => {
+  //     if (result) {
+  //       paymentRequest.render();
+  //     } else {
+  //       setResult("Not supported");
+  //       paymentRequest.destroy();
+  //     }
+  //   });
+  // };
 
   return (
     <div className="container">
@@ -236,10 +237,10 @@ function Home() {
                   : Math.round(sum)}{" "}
                 {currency}
               </p>
-              <p>
+              {/* <p>
                 {String.fromCharCode(8211)} OR {String.fromCharCode(8211)}
-              </p>
-              <button
+              </p> */}
+              {/* <button
                 className="pay-option-button Gpay-button"
                 onClick={() => {
                   payWithRevolutApple();
@@ -257,7 +258,7 @@ function Home() {
                     "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Google_Pay_%28GPay%29_Logo_%282018-2020%29.svg/512px-Google_Pay_%28GPay%29_Logo_%282018-2020%29.svg.png"
                   }
                 />
-              </button>
+              </button> */}
               <div
                 style={{
                   width: "400px",

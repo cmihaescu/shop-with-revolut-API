@@ -1,8 +1,8 @@
-const CheckoutLive = async (sum, currency, history) => {
-  let data = { amount: sum*100, currency };
+const UpdateOrderLive = async (sum, currency, order_id, history) => {
+  let data = { amount: sum, currency:currency, order_id:order_id};
 
   try {
-    await fetch("/card/newOrderLive", {
+    await fetch("/card/updateOrderLive", {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
@@ -13,10 +13,12 @@ const CheckoutLive = async (sum, currency, history) => {
       .then((data) => data)
       .then((body) => {
         history.push("/cardLive", body);
+        console.log('update Order response', body)
       });
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 
-export default CheckoutLive;
+export default UpdateOrderLive;
