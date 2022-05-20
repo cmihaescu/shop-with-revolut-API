@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and [ExpressJS](https://expressjs.com/en/starter/installing.html).
 
-## Starting the project
+## Starting this project
 
 First, you need to create a revolut business [sandbox account](https://sandbox-business.revolut.com/signin?rr=d8dea). From there you will take your API_KEY (profile-> Merchant API -> Production API KEY). 
 Second, install the dependencies on the client side as well as on the server side.
