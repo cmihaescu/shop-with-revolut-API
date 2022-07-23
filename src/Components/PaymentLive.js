@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import RevolutCheckout from "@revolut/checkout";
-import UpdateOrderLive from "./UpdateOrder"
+import UpdateOrderLive from "./Requests/UpdateOrder"
 
 const PaymentLive = () => {
   const [name, setName] = useState(null);
@@ -80,7 +80,7 @@ const PaymentLive = () => {
 
   //============PAY WITH REVOLUTPAY============
 
-  const payWithRevolutPay = () => {
+  React.useEffect(() => {
     RevolutCheckout(public_id, "prod").then(function (instance) {
       instance.revolutPay({
         target: document.getElementById("revolut-pay"),
@@ -92,10 +92,9 @@ const PaymentLive = () => {
         onError(error) {
           console.error("Payment failed: " + error.message);
         },
-        capture_mode: "MANUAL",
       });
     });
-  };
+  }, [])
 
   //============PAY WITH APPLE/GOOGLE PAY============
 
@@ -260,9 +259,6 @@ const PaymentLive = () => {
       >
         <button className='pay-option-button' id="button-submit">Pay with Card</button>
         <button className='pay-option-button' onClick={() => payWithPopup()}>Pay with Popup</button>
-        <button className='pay-option-button' onClick={() => payWithRevolutPay()}>
-          Pay with Revolut Pay
-        </button>
         <button className='pay-option-button' onClick={() => payWithRevolutApple()}>
           Pay with Apple/Google Pay
         </button>

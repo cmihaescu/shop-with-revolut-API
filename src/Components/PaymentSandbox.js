@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import RevolutCheckout from "@revolut/checkout";
+import ConfirmOrder from "./Requests/ConfirmOrder";
+
 
 const PaymentSandbox = () => {
   const [name, setName] = useState(null);
@@ -21,12 +23,14 @@ const PaymentSandbox = () => {
     let value = e.target.value;
     setBillingAddress({ ...billingAddress, [name]: value });
   };
-
-  //============PAY WITH POPUP============
-
+  
+  
   let public_id = useHistory().location.state.public_id;
   let order_id = useHistory().location.state.id;
   let body = useHistory().location.state;
+  let for_merchant = "0250a474-71a3-4993-ad98-1a24e3c815cc";
+  let for_customer = "b465452f-72f6-4237-83d9-3c2b1a5a9f2d";
+  //============PAY WITH POPUP============
 
   const payWithPopup = () =>
     RevolutCheckout(public_id, "sandbox").then(function (instance) {
@@ -71,7 +75,7 @@ const PaymentSandbox = () => {
 
   //============PAY WITH REVOLUTPAY============
 
-  const payWithRevolutPay = () => {
+  React.useEffect(() => {
     RevolutCheckout(public_id, "sandbox").then(function (instance) {
       instance.revolutPay({
         target: document.getElementById("revolut-pay"),
@@ -85,7 +89,7 @@ const PaymentSandbox = () => {
         },
       });
     });
-  };
+  }, [])
 
   return (
     <div className="payment-sandbox-page" style={{ display: "grid", gridTemplateColumns: "2fr 1fr" }}>
@@ -193,10 +197,13 @@ const PaymentSandbox = () => {
         >
           <button className='pay-option-button' id="button-submit">Pay with Card</button>
           <button className='pay-option-button' onClick={() => payWithPopup()}>Pay with Popup</button>
-          <button className='pay-option-button' onClick={() => payWithRevolutPay()}>
-            Pay with Revolut Pay
-          </button>
-        </div>
+          <button
+                className="pay-option-button"
+                onClick={() => ConfirmOrder(for_customer, order_id)}
+              >
+                {" "}
+                Confirm Order
+              </button>        </div>
         <div
           style={{
             width: "400px",
