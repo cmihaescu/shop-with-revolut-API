@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import CheckoutSandbox from "./CheckoutSandbox";
-import CheckoutLive from "./CheckoutLive";
+import CheckoutSandbox from "./Requests/CheckoutSandbox";
+import CheckoutLive from "./Requests/CheckoutLive";
 import RevolutCheckout from "@revolut/checkout";
 
 function Home() {
@@ -12,6 +12,8 @@ function Home() {
   // const [capture, setCapture] = useState(0);
   const currencies = ["USD", "EUR", "GBP", "RON"];
   const [result, setResult] = useState(null);
+  let customer_id = "16ec0824-1a78-4032-adfa-fefab834a591";
+  
 
   const items = [
     { name: "Backpack", price: 150 },
@@ -115,7 +117,7 @@ function Home() {
 
   return (
     <div className="container">
-      <h1> Revolut Shop </h1>
+      <h1> Revolut Shop Test </h1>
       <div        
         style={{ display: "grid", gridTemplateColumns: "1fr 3fr" }}
       >
@@ -214,7 +216,7 @@ function Home() {
               </ul>
               <button
                 className="pay-option-button"
-                onClick={() => CheckoutSandbox(sum, currency, history)}
+                onClick={() => CheckoutSandbox(sum, currency, customer_id, history)}
               >
                 {" "}
                 Go to Checkout-Sandbox

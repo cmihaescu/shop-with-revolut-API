@@ -1,5 +1,5 @@
-const CheckoutSandbox = async (sum, currency, history) => {
-  let data = { amount: sum*100, currency };
+const CheckoutSandbox = async (sum, currency, customer_id, history) => {
+  let data = { amount: sum*100, currency, customer_id };
 
   try {
     await fetch("/card/newOrderSandbox", {
